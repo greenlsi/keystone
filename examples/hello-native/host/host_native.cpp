@@ -41,6 +41,9 @@ main(int argc, char** argv) {
   edge_call_init_internals(
       (uintptr_t)enclave.getSharedBuffer(), enclave.getSharedBufferSize());
 
+  printf("Shared buffer: 0x%lx\n", (uintptr_t)enclave.getSharedBuffer());
+  printf("Shared buffer size: %lu\n", enclave.getSharedBufferSize());
+
   enclave.run();
 
   return 0;

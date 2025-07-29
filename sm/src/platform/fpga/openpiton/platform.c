@@ -6,22 +6,8 @@
 #include "hpm-util.h"
 #include "sbi/riscv_encoding.h"
 
-void HPM_counter_setup(){
-  //Enable HPM counters access
-  HPM_EN_USER();
-
-  //HPM config event
-  write_csr(mhpmevent3, 7);
-
-  //HPM remove inhibit from counter 3
-  uint64_t mcountinhibit_reg = read_csr(mcountinhibit);
-  write_csr(mcountinhibit, mcountinhibit_reg & ~(1UL << 3)); 
-}
-
+// There is no need to configure mhpmevent for exception counter as it is already mapped to mhpmcounter9 (defined in soc architecture)
 unsigned long platform_init_global_once(){
-
-  HPM_counter_setup();
-
   return SBI_ERR_SM_ENCLAVE_SUCCESS;
 }
 
@@ -47,13 +33,13 @@ unsigned long platform_create_enclave(struct enclave* enclave){
 }
 
 void platform_switch_to_enclave(struct enclave* enclave){
-  enclave->ped.initial_hpm = (unsigned int) HPM_READ(mhpmcounter3);
+  enclave->ped.initial_hpm = (unsigned int) HPM_READ(mhpmcounter9);
   return;
 }
 
 void platform_switch_from_enclave(struct enclave* enclave){
   enclave->ped.context_switch_count++;
-  enclave->ped.total_hpm += HPM_READ(mhpmcounter3) - enclave->ped.initial_hpm;
+  enclave->ped.total_hpm += HPM_READ(mhpmcounter9) - enclave->ped.initial_hpm;
   return;
 }
 

@@ -13,6 +13,8 @@ extern "C" {
 #include "ElfFile.hpp"
 #include "hash_util.hpp"
 
+#include "edge/edge_common.h"
+
 namespace Keystone {
 
 Enclave::Enclave() {
@@ -239,6 +241,57 @@ Enclave::run(uintptr_t* retval) {
     /* enclave is stopped in the middle. */
     if (ret == Error::EdgeCallHost && oFuncDispatch != NULL) {
       oFuncDispatch(getSharedBuffer());
+    }
+    ret = pDevice->resume(retval);
+  }
+
+  if (ret != Error::Success) {
+    ERROR("failed to run enclave - ioctl() failed");
+    destroy();
+    return Error::DeviceError;
+  }
+
+  return Error::Success;
+}
+
+#define OCALL_REQUEST_ENCLAVE_FUNC 2
+
+Error 
+Enclave::runUntilRequest(uintptr_t* retval) {
+  Error ret = pDevice->run(retval);
+
+  while (ret == Error::EdgeCallHost || ret == Error::EnclaveInterrupted) {
+    if (ret == Error::EdgeCallHost && oFuncDispatch != nullptr) {
+      oFuncDispatch(getSharedBuffer()); 
+      struct edge_call* edge_call = (struct edge_call*)getSharedBuffer();
+      if (edge_call != nullptr && edge_call->call_id == OCALL_REQUEST_ENCLAVE_FUNC) {
+        return Error::EdgeCallHost;
+      }
+    }
+    ret = pDevice->resume(retval);
+  }
+
+  if (ret != Error::Success) {
+    ERROR("failed to run enclave - ioctl() failed");
+    destroy();
+    return Error::DeviceError;
+  }
+
+  return Error::Success;
+}
+
+
+Error
+Enclave::resumeUntilRequest(uintptr_t* retval) {
+  Error ret = pDevice->resume(retval);
+
+  while (ret == Error::EdgeCallHost || ret == Error::EnclaveInterrupted) {
+    if (ret == Error::EdgeCallHost && oFuncDispatch != nullptr) {
+      oFuncDispatch(getSharedBuffer());
+      struct edge_call* edge_call = (struct edge_call*)getSharedBuffer();
+      if (edge_call != nullptr && edge_call->call_id == OCALL_REQUEST_ENCLAVE_FUNC) {
+        return Error::EdgeCallHost;
+      }
     }
     ret = pDevice->resume(retval);
   }

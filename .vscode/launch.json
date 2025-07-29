@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "valuesFormatting": "parseText",       
+            "type": "gdb",
+            "request": "attach",
+            "name": "Attach to gdbserver, OpenSBI Debugging",
+            "executable": "build-openpiton64/buildroot.build/images/fw_payload.elf",
+            "target": "localhost:3333",
+            "remote": true,
+            "env": {
+                "PATH": "/opt/riscv/bin:${env:PATH}"
+            },
+            "cwd": "${workspaceRoot}", 
+            "gdbpath": "/opt/riscv/bin/riscv64-unknown-elf-gdb",
+            //"stopAtEntry": true,
+            "stopAtConnect": true
+        },
+        {
+            "name": "QEMU Attach to gdbserver, Kernel Debugging",
+            "type": "gdb",
+            "request": "attach",
+            "executable": "build-generic64/buildroot.build/build/linux-6.1.32/vmlinux",
+            "target": "localhost:9822",
+            "remote": true,
+            "env": {
+              "PATH": "/opt/riscv/bin:${env:PATH}"
+            },
+            "cwd": "${workspaceRoot}",
+            "gdbpath": "/opt/riscv/bin/riscv64-unknown-linux-gnu-gdb",
+            "stopAtConnect": true,
+            "valuesFormatting": "parseText",
+        }
+    ] 
+}
+          

@@ -4,9 +4,9 @@
 
 // No special data needed for default platform
 struct platform_enclave_data{
-    int context_switch_count;
-    int total_hpm;
-    int initial_hpm;
+  int context_switch_count;
+  int total_hpm;
+  int initial_hpm;
 };
 
 // Enclave configuration
@@ -18,11 +18,11 @@ struct platform_enclave_data{
 #define SMM_SIZE                0x100000
 
 // PMP configuration
-#define PMP_N_REG               8
+#define PMP_N_REG               4
 #define PMP_MAX_N_REGION        16
 
 // CPU configuration
-#define MAX_HARTS               5
+#define MAX_HARTS               2
 
 
 // Initialization functions

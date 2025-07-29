@@ -31,6 +31,8 @@ byte sm_public_key[PUBLIC_KEY_SIZE] = { 0, };
 byte sm_private_key[PRIVATE_KEY_SIZE] = { 0, };
 byte dev_public_key[PUBLIC_KEY_SIZE] = { 0, };
 
+unsigned int sanctum_sm_size = 0x1ff000;
+
 int osm_pmp_set(uint8_t perm)
 {
   /* in case of OSM, PMP cfg is exactly the opposite.*/
@@ -89,31 +91,29 @@ static void sm_print_hash(void)
   sbi_printf("\n");
 }
 
-/*
 void sm_print_cert()
 {
 	int i;
 
-	printm("Booting from Security Monitor\n");
-	printm("Size: %d\n", sanctum_sm_size[0]);
+	sbi_printf("Booting from Security Monitor\n");
+	sbi_printf("Size: %d\n", sanctum_sm_size);
 
-	printm("============ PUBKEY =============\n");
-	for(i=0; i<8; i+=1)
+	sbi_printf("============ PUBKEY =============\n");
+	for(i=0; i<32; i+=1)
 	{
-		printm("%x",*((int*)sanctum_dev_public_key+i));
-		if(i%4==3) printm("\n");
+		sbi_printf("%02x",dev_public_key[i]);
+		if(i%16==15) sbi_printf("\n");
 	}
-	printm("=================================\n");
+	sbi_printf("=================================\n");
 
-	printm("=========== SIGNATURE ===========\n");
-	for(i=0; i<16; i+=1)
+	sbi_printf("=========== SIGNATURE ===========\n");
+	for(i=0; i<64; i+=1)
 	{
-		printm("%x",*((int*)sanctum_sm_signature+i));
-		if(i%4==3) printm("\n");
+		sbi_printf("%02x",sm_signature[i]);
+		if(i%16==15) sbi_printf("\n");
 	}
-	printm("=================================\n");
+	sbi_printf("=================================\n");
 }
-*/
 
 void sm_init(bool cold_boot)
 {
@@ -158,7 +158,7 @@ void sm_init(bool cold_boot)
 
   /* below are executed by all harts */
   pmp_init();
-  pmp_set_keystone(sm_region_id, PMP_NO_PERM);
+  pmp_set_keystone(sm_region_id, PMP_NO_PERM); 
   pmp_set_keystone(os_region_id, PMP_ALL_PERM);
 
   /* Fire platform specific global init */
@@ -167,9 +167,12 @@ void sm_init(bool cold_boot)
     sbi_hart_hang();
   }
 
+  if(cold_boot){
   sbi_printf("[SM] Keystone security monitor has been initialized!\n");
 
   sm_print_hash();
+  sm_print_cert();
+  }
 
   return;
   // for debug

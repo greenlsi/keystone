@@ -17,7 +17,10 @@ endif
 # Platform headers
 ifeq ($(KEYSTONE_PLATFORM),cva6)
     #for CVA6, the actual target platform is fpga/ariane, so PLATFORM variable is used
-    keystone-sm-headers += platform/$(PLATFORM)/platform.h
+    keystone-sm-headers += platform/$(PLATFORM)/platform.h platform/$(PLATFORM)/hpm-util.h
+else ifeq ($(KEYSTONE_PLATFORM),openpiton)
+    #for openpiton, the actual target platform is fpga/openpiton, so PLATFORM variable is used
+    keystone-sm-headers += platform/$(PLATFORM)/platform.h platform/$(PLATFORM)/hpm-util.h
 else
     keystone-sm-headers += platform/$(KEYSTONE_PLATFORM)/platform.h
 endif

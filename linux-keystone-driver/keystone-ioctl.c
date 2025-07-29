@@ -8,6 +8,15 @@
 #include <asm/sbi.h>
 #include <linux/uaccess.h>
 #include <linux/string.h>
+#include <linux/printk.h>
+#include <linux/kernel.h> 
+#include <linux/io.h>     
+
+// Acceso a memoria desde buffer
+/* void *utm_kernel;
+size_t utm_size;
+uintptr_t utm_paddr;
+void __iomem *mapped_utm; */
 
 int __keystone_destroy_enclave(unsigned int ueid);
 
@@ -113,6 +122,34 @@ int keystone_run_enclave(unsigned long data)
   }
 
   ret = sbi_sm_run_enclave(enclave->eid);
+ 
+// Acceso a memoria desde buffer
+  /* printk(KERN_INFO "Reading buffer from kernel: ");
+
+  mapped_utm = ioremap(utm_paddr, utm_size);
+  if (!mapped_utm) {
+    pr_err("Error: ioremap failed\n");
+    return -ENOMEM;
+  }
+  printk(KERN_INFO "mapped_utm: %p\n", mapped_utm);
+  
+
+  unsigned char h = readb(mapped_utm + 0x30);
+  printk(KERN_INFO "Read byte at offset 0x30: %02x\n", h);
+  h = h+1;
+  writeb(h, mapped_utm + 0x30);
+
+  
+  #define READ_SIZE 240
+  char buffer[READ_SIZE + 1];
+
+  printk(KERN_INFO "UTM content (hex):\n");
+  for (int i = 0; i < 2; i++) {
+    memcpy_fromio(buffer, mapped_utm + i * READ_SIZE, READ_SIZE);
+    buffer[READ_SIZE] = '\0';
+    printk(KERN_INFO "---- Dump %d (offset 0x%x) ----\n", i, i * READ_SIZE);
+    print_hex_dump(KERN_INFO, "  ", DUMP_PREFIX_OFFSET, 16, 1, buffer, READ_SIZE, false);
+  } */
 
   arg->error = ret.error;
   arg->value = ret.value;
@@ -148,6 +185,14 @@ int utm_init_ioctl(struct file *filp, unsigned long arg)
 
   enclp->utm_paddr = __pa(utm->ptr);
 
+// Acceso a memoria desde buffer
+  /* utm_kernel = utm->ptr;
+  utm_size = utm->size;
+  utm_paddr = enclp->utm_paddr;
+
+  printk(KERN_INFO "utm physical address 0x%lx\n", utm_paddr);
+  printk(KERN_INFO "utm size %zu\n", utm_size);
+ */
   return ret;
 }
 
@@ -214,6 +259,22 @@ int keystone_resume_enclave(unsigned long data)
 
   ret = sbi_sm_resume_enclave(enclave->eid);
 
+// Acceso a memoria desde buffer
+  /* unsigned char h = readb(mapped_utm);
+  h = h+1;
+  writeb(h, mapped_utm);
+
+  #define READ_SIZE 240
+  char buffer[READ_SIZE + 1];
+
+  printk(KERN_INFO "UTM content (hex):\n");
+  for (int i = 0; i < 2; i++) {
+    memcpy_fromio(buffer, mapped_utm + i * READ_SIZE, READ_SIZE);
+    buffer[READ_SIZE] = '\0';
+    printk(KERN_INFO "---- Dump %d (offset 0x%x) ----\n", i, i * READ_SIZE);
+    print_hex_dump(KERN_INFO, "  ", DUMP_PREFIX_OFFSET, 16, 1, buffer, READ_SIZE, false);
+  }
+ */
   arg->error = ret.error;
   arg->value = ret.value;
 

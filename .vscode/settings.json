@@ -1,0 +1,32 @@
+{
+    "files.associations": {
+        "*.tcc": "c",
+        "internet": "c",
+        "atomic": "c",
+        "fstream": "c",
+        "functional": "c",
+        "riscv_encoding.h": "c",
+        "hpm-util.h": "c",
+        "cstddef": "c",
+        "riscv_barrier.h": "c",
+        "random": "c",
+        "*.x": "c",
+        "buffer": "cpp",
+        "stdio.h": "c",
+        "unistd.h": "c",
+        "edge_common.h": "c",
+        "syscall.h": "c",
+        "syscall_nums.h": "c",
+        "sbi_trap.h": "c",
+        "sbi_ecall.h": "c",
+        "printf.h": "c",
+        "keystone_user.h": "c",
+        "edge_call.h": "c",
+        "malloc.h": "c",
+        "eapp_utils.h": "c"
+    },
+    "files.watcherExclude": {
+        "**/target": true
+    },
+    "makefile.configureOnOpen": false
+}

@@ -11,6 +11,7 @@
 #include "uaccess.h"
 #include "mm/mm.h"
 #include "util/rt_util.h"
+#include "util/printf.h"
 
 #include "call/syscall_nums.h"
 
@@ -81,12 +82,25 @@ uintptr_t dispatch_edgecall_ocall( unsigned long call_id,
 
   edge_call->call_id = call_id;
   uintptr_t buffer_data_start = edge_call_data_ptr();
+  //printf("buffer_data_start: 0x%lx\n", (uintptr_t)buffer_data_start);
 
   if(data_len > (shared_buffer_size - (buffer_data_start - shared_buffer))){
     goto ocall_error;
   }
+
+  //printf("copying in 0x%lx, data: 0x%lx, len %lu\n",
+  //    (uintptr_t)buffer_data_start, (uintptr_t)data, data_len);
+
   //TODO safety check on source
   copy_from_user((void*)buffer_data_start, (void*)data, data_len);
+
+  // Print the content of buffer_data_start
+  // unsigned char* copied_data = (unsigned char*)buffer_data_start;
+  // printf("Copied data content: ");
+  // for (size_t i = 0; i < data_len; i++) {
+  //     printf("%02x ", copied_data[i]); // Print each byte in hexadecimal
+  // }
+  // printf("\n");
 
   if(edge_call_setup_call(edge_call, (void*)buffer_data_start, data_len) != 0){
     goto ocall_error;

@@ -13,6 +13,7 @@
 #include <sbi/riscv_asm.h>
 #include <sbi/riscv_locks.h>
 #include <sbi/riscv_atomic.h>
+#include <sbi/sbi_console.h>
 
 #ifndef TARGET_PLATFORM_HEADER
 #error "SM requires a defined platform to build"

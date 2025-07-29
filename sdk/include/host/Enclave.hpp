@@ -66,6 +66,8 @@ class Enclave {
       uintptr_t alternatePhysAddr);
   Error destroy();
   Error run(uintptr_t* ret = nullptr);
+  Error runUntilRequest(uintptr_t* retval);
+  Error resumeUntilRequest(uintptr_t* retval);
 };
 
 uint64_t
